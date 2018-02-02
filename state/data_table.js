@@ -1,44 +1,28 @@
-import {observable, computed, action, transaction, asMap, toJS} from 'mobx'
-import DataManipState from './data_manip'
+import {observable, computed, action, toJS} from 'mobx'
 
-export default class DataTableState extends DataManipState {
+export default class DataTableState {
 
-  initEntityListView(entityname, cfg) {
-    const qParams = this.router.queryParams
-    return transaction(() => {
-      qParams._page = qParams._page || 1
-      qParams._perPage = localStorage.getItem('cargo_perPage') || qParams._perPage || cfg.perPage || 15
-      cfg.init && cfg.init(this)
-      this.cv = observable(Object.assign({}, cfg.view, {
-        type: 'entity_list',
-        entityname: entityname,
-        items: [],
-        totalItems: 0,
-        selection: [],
-        filters: asMap(this.appliedFilters),
-        state: 'loading'
-      }))
-      return this._refreshList()
-    })
+  @observable state = 'loading'
+  @observable items = []
+  @observable totalItems = 0
+  @observable selection = []
+  perPage = 15
+  pkName = 'id'
+
+  constructor(entityname, requester, router, updateQPars, dirty) {
+    this.requester = requester
+    this.entityname = entityname
+    this.router = router
+    this.updateQPars = updateQPars
+    this.dirty = dirty
+    for (let attr in router.queryParams) {  // init filters
+      attr[0] !== '_' && this.filters.set(attr, router.queryParams[attr])
+    }
   }
 
-  beforeListViewExit() {
-    const queryParamsBackup = Object.assign({}, this.router.queryParams)
-    this.listQParamsBackup = queryParamsBackup
-  }
-
-  detailClicked(row) {
-    this.router.goTo(this.views.entity_detail, {
-      entityname: this.router.params.entityname,
-      id: row[this.cv.pkName || 'id']
-    }, this)
-  }
-
-  addClicked() {
-    this.router.goTo(this.views.entity_detail, {
-      entityname: this.router.params.entityname,
-      id: '_new'
-    }, this)
+  init() {
+    this.setDefaults()
+    return this._refreshList()
   }
 
   @action
@@ -46,8 +30,8 @@ export default class DataTableState extends DataManipState {
     const newQPars = Object.assign({}, toJS(this.router.queryParams), {
       '_page': page
     })
-    this.cv.selection = []
-    this.router.goTo(this.router.currentView, this.router.params, this, newQPars)
+    this.selection = []
+    this.updateQPars(newQPars)
   }
 
   @action
@@ -56,8 +40,7 @@ export default class DataTableState extends DataManipState {
       '_page': 1,
       '_perPage': num
     })
-    localStorage.setItem('cargo_perPage', num)
-    this.router.goTo(this.router.currentView, this.router.params, this, newQPars)
+    this.updateQPars(newQPars)
   }
 
   @action
@@ -83,8 +66,8 @@ export default class DataTableState extends DataManipState {
       delete newQPars._sortField
       delete newQPars._sortDir
     }
-    this.cv.selection = []
-    this.router.goTo(this.router.currentView, this.router.params, this, newQPars)
+    this.selection = []
+    this.updateQPars(newQPars)
   }
 
   @action
@@ -96,21 +79,22 @@ export default class DataTableState extends DataManipState {
 
   @action
   deleteData(data) {
-    const id = data[0][this.cv.pkName]
-    return this.requester.deleteEntry(this.cv.entityname, id).then(() => {
+    const id = data[0][this.pkName]
+    return this.requester.deleteEntry(this.entityname, id).then(() => {
       return this._refreshList()
     })
   }
 
   @action
   deleteSelected() {
-    const promises = this.cv.selection.map((selected) => {
-      const id = this.cv.items[selected][this.cv.pkName]
-      return this.requester.deleteEntry(this.cv.entityname, id)
+    const promises = this.selection.map((selected) => {
+      const id = this.items[selected][this.pkName]
+      return this.requester.deleteEntry(this.entityname, id)
     })
-    return Promise.all(promises).then(() => {   // wait for all delete reqests
-      this.cv.selection = []
-      this.markDirty(this.cv.entityname)
+    // wait for all delete reqests
+    return Promise.all(promises).then(() => {
+      this.selection = []
+      this.dirty[this.entityname] = null
       return this._refreshList()
     })
   }
@@ -118,28 +102,34 @@ export default class DataTableState extends DataManipState {
   // ---------------------- selection  ----------------------------
 
   @computed get selected_ids() {
-    return this.cv.selection.map((selected) => {
-      return this.cv.items[selected][this.cv.pkName]
+    return this.selection.map((selected) => {
+      return this.items[selected][this.pkName]
     })
+  }
+
+  @computed get selectedItems() {
+    return this.selection.map(i => this.items[i])
   }
 
   @action
   updateSelection(data) {
-    this.cv.selection = data
+    this.selection = data
   }
 
   @action toggleIndex(idx) {
-    const removed = this.cv.selection.remove(idx)
+    const removed = this.selection.remove(idx)
     if(! removed) {
-      this.cv.selection.push(idx)
+      this.selection.push(idx)
     }
   }
 
   @action selectAll() {
-    this.cv.selection = this.cv.items.map((i, idx) => idx)
+    this.selection = this.items.map((i, idx) => idx)
   }
 
   // ---------------------- filtration  ----------------------------
+
+  @observable filters = new Map()
 
   @computed get appliedFilters() {
     const applied = {}
@@ -152,73 +142,73 @@ export default class DataTableState extends DataManipState {
   }
 
   @computed get areFiltersApplied() {
-    return JSON.stringify(this.cv.filters) === JSON.stringify(this.appliedFilters)
+    return JSON.stringify(this.filters) === JSON.stringify(this.appliedFilters)
   }
 
   @action
   updateFilterValue(name, value) {
-    this.cv.filters.set(name, value)
+    this.filters.set(name, value)
   }
 
   @action
   applyFilters() {
-    const newQPars = Object.assign({}, this.cv.filters.toJS(), {
+    const newQPars = Object.assign({}, this.filters.toJS(), {
       '_page': 1,  // need to go to 1st page due to limited results
       '_perPage': this.router.queryParams['_perPage'],
       '_sortField': this.router.queryParams['_sortField'],
       '_sortDir': this.router.queryParams['_sortDir']
     })
-    this.router.entityname = this.cv.entityname
-    this.router.goTo(this.router.currentView, this.router.params, this, newQPars)
+    this.updateQPars(newQPars)
   }
 
   @action
   showFilter(filter) {
-    this.cv.filters.set(filter, undefined)
+    this.filters.set(filter, undefined)
   }
 
   @action
   hideFilter(filter) {
-    this.cv.filters.delete(filter)
-    const newQPars = Object.assign({}, this.cv.filters.toJS(), {
+    this.filters.delete(filter)
+    const newQPars = Object.assign({}, this.filters.toJS(), {
       '_page': this.router.queryParams['_page'],
       '_perPage': this.router.queryParams['_perPage'],
       '_sortField': this.router.queryParams['_sortField'],
       '_sortDir': this.router.queryParams['_sortDir']
     })
-    this.router.goTo(this.router.currentView, this.router.params, this, newQPars)
+    this.updateQPars(newQPars)
   }
 
   // ---------------------- privates, support ----------------------------
 
-  _refreshList() {
-    this.cv.state = 'loading'
+  getRequestParams(params) {
+    return new Promise((resolve, _) => resolve(params))
+  }
 
-    if (this.router.entityname && this.cv.entityname && this.router.entityname !== this.cv.entityname) {
-      for (let k in this.router.queryParams) {
-        if (k[0] !== '_') {
-          this.cv.filters.delete(k)
-          delete this.router.queryParams[k]
-        }
-      }
+  setDefaults() {
+    const qp = this.router.queryParams
+    // set params if missing _page || _perPage
+    qp._page = qp._page ? qp._page : 1
+    qp._perPage = qp._perPage ? qp._perPage : this.perPage
+    if (this.defaultSortField && !qp._sortField) {
+      qp._sortField = this.defaultSortField
+      qp._sortDir = this.defaultSortDir
     }
+  }
 
-    const pars = Object.assign({}, this.router.queryParams, {
-      _extraparams: this.cv.extraparams
+  _refreshList() {
+    this.state = 'loading'
+    return this.getRequestParams(toJS(this.router.queryParams))
+    .then(pars => {
+      return this.requester.getEntries(this.entityname, pars)
     })
+    .then(this.onDataLoaded.bind(this))
+  }
 
-    // set params from this.cv if missing _page || _perPage
-    pars['_page'] = parseInt(pars['_page']) > 0 ? parseInt(pars['_page']) : 1
-    pars['_perPage'] = parseInt(pars['_perPage']) > 0 ? parseInt(pars['_perPage']) : parseInt(this.cv.perPage)
-
-    return this.requester.getEntries(this.cv.entityname, pars)
-    .then((result) => {
-      result && transaction(() => {
-        this.cv.state = 'ready'
-        this.cv.totalItems = result.totalItems
-        this.cv.items && this.cv.items.replace(result.data)
-      })
-    })
+  @action
+  onDataLoaded(result) {
+    this.state = 'ready'
+    this.totalItems = result.totalItems
+    this.items.replace(result.data)
   }
 
 }

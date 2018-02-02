@@ -1,3 +1,4 @@
+/* global confirm */
 import React from 'react'
 import DeleteIcon from 'material-ui/svg-icons/action/delete'
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
@@ -8,13 +9,12 @@ import TextField from 'react-mobx-admin/components/common/field/text'
 import BoolField from 'react-mobx-admin/components/mui/field/bool'
 import ListView from 'react-mobx-admin/components/mui/view/list'
 
-
 const TagListView = ({store}) => {
-
+  //
   const batchActions = () => {
     function _batchDelete () {
       if (confirm(`Are you sure you want to delete selected tags?`)) {
-        store.deleteSelected()
+        store.cv.deleteSelected()
       }
     }
     return (
@@ -28,7 +28,7 @@ const TagListView = ({store}) => {
     (attr, row) => (<TextField attr={attr} val={row[attr]} />),
     (attr, row) => {
       const DetailLink = ({text}) => (
-        <a href='javascript:void(0)' onTouchTap={() => store.detailClicked(row)}>{text}</a>
+        <a href='javascript:void(0)' onClick={() => store.detailClicked(row)}>{text}</a>
       )
       return <TextField attr={attr} val={row[attr]} Component={DetailLink} />
     },
@@ -36,7 +36,7 @@ const TagListView = ({store}) => {
   ]
 
   return (
-    <ListView store={store} fields={fields}
+    <ListView store={store.cv} fields={fields}
       batchActions={batchActions} onAddClicked={store.addClicked.bind(store)} />
 
   )
