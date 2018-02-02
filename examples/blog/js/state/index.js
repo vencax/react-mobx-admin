@@ -2,8 +2,8 @@ import { observable, computed, toJS, action, transaction } from 'mobx'
 import { RouterStore } from 'mobx-router'
 import OptionsStore from './options'
 
-import Posts from './posts'
-import Tags from './tags'
+import {PostTableState, PostManipState} from './posts'
+import {TagTableState, TagManipState} from './tags'
 
 export default class StateStore extends OptionsStore {
 
@@ -12,15 +12,13 @@ export default class StateStore extends OptionsStore {
     this.router = new RouterStore()
     this.views = views
 
-    const tags = Tags(this)
-    const posts = Posts(this)
     this.manipStores = {
-      'tags': tags.ManipState,
-      'posts': posts.ManipState
+      'tags': TagManipState,
+      'posts': PostManipState
     }
     this.listStores = {
-      'tags': tags.TableState,
-      'posts': posts.TableState
+      'tags': TagTableState,
+      'posts': PostTableState
     }
   }
 
@@ -30,9 +28,10 @@ export default class StateStore extends OptionsStore {
       return this.on404('unknown entity ' + entityname)
     }
     id = (id && id !== '_new') ? id : null
-    this.cv = new StoreClass(entityname, id, this.requester.saveEntry.bind(this.requester))
+    this.cv = new StoreClass(this, (data) => this.requester.saveEntry(entityname, data, data.id))
     this.cv.init()
-    id && this.requester.getEntry(entityname, id).then(this.cv.onLoaded.bind(this.cv))
+    id && this.requester.getEntry(entityname, id)
+    .then(this.cv.onLoaded.bind(this.cv))
   }
 
   showEntityListView() {
@@ -41,7 +40,8 @@ export default class StateStore extends OptionsStore {
     if (StoreClass === undefined) {
       return this.on404('unknown entity ' + entityname)
     }
-    this.cv = new StoreClass(entityname, this.requester, this.router, (newQPars) => {
+    const getEntries = (opts) => this.requester.getEntries(entityname, opts)
+    this.cv = new StoreClass(this, this.router, getEntries, (newQPars) => {
       this.router.goTo(this.router.currentView, this.router.params, this, newQPars)
     })
     this.cv.init()

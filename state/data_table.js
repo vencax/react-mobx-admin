@@ -9,12 +9,10 @@ export default class DataTableState {
   perPage = 15
   pkName = 'id'
 
-  constructor(entityname, requester, router, updateQPars, dirty) {
-    this.requester = requester
-    this.entityname = entityname
+  constructor(router, getEntries, updateQPars) {
     this.router = router
+    this.getEntries = getEntries
     this.updateQPars = updateQPars
-    this.dirty = dirty
     for (let attr in router.queryParams) {  // init filters
       attr[0] !== '_' && this.filters.set(attr, router.queryParams[attr])
     }
@@ -73,30 +71,6 @@ export default class DataTableState {
   @action
   refresh() {
     return this._refreshList()
-  }
-
-  // ---------------------- delete  ----------------------------
-
-  @action
-  deleteData(data) {
-    const id = data[0][this.pkName]
-    return this.requester.deleteEntry(this.entityname, id).then(() => {
-      return this._refreshList()
-    })
-  }
-
-  @action
-  deleteSelected() {
-    const promises = this.selection.map((selected) => {
-      const id = this.items[selected][this.pkName]
-      return this.requester.deleteEntry(this.entityname, id)
-    })
-    // wait for all delete reqests
-    return Promise.all(promises).then(() => {
-      this.selection = []
-      this.dirty[this.entityname] = null
-      return this._refreshList()
-    })
   }
 
   // ---------------------- selection  ----------------------------
@@ -199,7 +173,7 @@ export default class DataTableState {
     this.state = 'loading'
     return this.getRequestParams(toJS(this.router.queryParams))
     .then(pars => {
-      return this.requester.getEntries(this.entityname, pars)
+      return this.getEntries(pars)
     })
     .then(this.onDataLoaded.bind(this))
   }
@@ -209,6 +183,7 @@ export default class DataTableState {
     this.state = 'ready'
     this.totalItems = result.totalItems
     this.items.replace(result.data)
+    return result
   }
 
 }
