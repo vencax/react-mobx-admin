@@ -12,6 +12,7 @@ export default class AuthStore {
     }
     // create requester here because we need to provide on401 callback for it ..
     this.requester = new BlogRequester(this.on401.bind(this))
+    this.onError = this.onError.bind(this)
   }
 
   on401(err) {

@@ -10,46 +10,37 @@ export default class DataManipState {
 
   pkName = 'id'
 
-  constructor(saveEntry) {
-    if (this.prepareNew === undefined) {
-      throw new Error('implement prepareNew method!')
-    }
+  constructor (saveEntry) {
     this.saveEntry = saveEntry
   }
 
-  _onPrepared() {
-    this.origRecord = toJS(this.record)
-    this.runValidators()
-    this.state = 'ready'
+  initNew () {
+    return this.onLoaded({}) // init empty
   }
 
-  initNew() {
-    if (this.record.has(this.pkName)) return  // early return
-    const promise = this.prepareNew()
-    return promise
-      ? promise.then(this._onPrepared.bind(this))
-      : this._onPrepared()
+  load (data) {
+    if (data && data.then) {
+      return data.then(this.onLoaded.bind(this))
+    } else {
+      return data ? this.onLoaded(data) : this.initNew()
+    }
   }
 
-  init(data) {
-    return data ? this.onLoaded(data) : this.initNew()
-  }
-
-  @action onLoaded(record) {
+  @action onLoaded (record) {
     this.origRecord = JSON.parse(JSON.stringify(record))  // deep clone :)
     this.record.merge(record)
     this.runValidators()
     this.state = 'ready'
   }
 
-  runValidators() {
+  @action runValidators () {
     const validators = this.validators || []
     for (let fieldName in validators) {
       this.validateField(fieldName, this.record.get(fieldName))
     }
   }
 
-  validateField(fieldName, value) {
+  validateField (fieldName, value) {
     if (this.validators && this.validators[fieldName]) {
       const validatorFn = this.validators[fieldName].bind(this)
       const error = validatorFn(value, this.errors)
@@ -66,14 +57,14 @@ export default class DataManipState {
     return ! deepEqual(this.origRecord, record, {strict: true})
   }
 
-  @action save() {
+  @action save () {
     this.state = 'saving'
     return this.saveEntry(this.record.toJS())
     .then(this.onSaved.bind(this))
     .catch(this.onError.bind(this))
   }
 
-  @action onSaved(saved) {
+  @action onSaved (saved) {
     this.origRecord = JSON.parse(JSON.stringify(saved)) // update origRecord coz saved
     this.record.clear()
     this.record.merge(saved)
@@ -87,14 +78,14 @@ export default class DataManipState {
     return this.record
   }
 
-  @action onError(err) {
+  @action onError (err) {
     this.state = 'ready'
     this.saveErrors = [err]
   }
 
-  // called on each update of edit form. Validation performed if got some validators
-  @action
-  updateData(fieldName, value) {
+  // called on each update of edit form.
+  // validation performed if got some validators
+  @action updateData (fieldName, value) {
     value = value === '' ? null : value
     this.record.set(fieldName, value)
     this.validateField(fieldName, value)

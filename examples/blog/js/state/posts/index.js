@@ -8,12 +8,9 @@ class PostManipState extends DataManipState {
     this.store = store
   }
 
-  init() {
-    super.init()
+  load() {
     this.store.loadOptions('tags', '/tags')
-  }
-
-  prepareNew() {
+    return super.load()
   }
 
   edittitle = 'edit a nice post'
@@ -51,7 +48,7 @@ class PostManipState extends DataManipState {
     }
   }
 
-  onSaved(saved) {
+  onSaved (saved) {
     this.store.addMessage('post successfully saved', 'info', 2000)
     super.onSaved(saved)
   }

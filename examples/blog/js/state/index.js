@@ -29,9 +29,8 @@ export default class StateStore extends OptionsStore {
     }
     id = (id && id !== '_new') ? id : null
     this.cv = new StoreClass(this, (data) => this.requester.saveEntry(entityname, data, data.id))
-    this.cv.init()
-    id && this.requester.getEntry(entityname, id)
-    .then(this.cv.onLoaded.bind(this.cv))
+    const load = id && this.requester.getEntry(entityname, id).catch(this.onError)
+    this.cv.load(load)
   }
 
   showEntityListView() {

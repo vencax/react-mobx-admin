@@ -8,16 +8,14 @@ class TagManipState extends DataManipState {
     this.store = store
   }
 
-  prepareNew() {
+  initNew() {
     // simulation of loading or time expansive operation
-    const p = this.record.has('id') ? this.record : new Promise((resolve, reject) => {
-      setTimeout(() => {
-        this.record.set('published', true)
-        this.record.set('name', 'default name')
-        resolve(this.record)
-      }, 2000)
-    })
-    return p
+    setTimeout(() => {
+      this.onLoaded({
+        published: true,
+        name: 'default name'
+      })
+    }, 2000)
   }
 
   validators = {
