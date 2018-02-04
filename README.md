@@ -1,9 +1,9 @@
 # react-mobx-admin
 
-[![Build Status](https://travis-ci.org/blueskydigital/react-mobx-admin.svg)](https://travis-ci.org/blueskydigital/react-mobx-admin)
+[![Build Status](https://travis-ci.org/vencax/react-mobx-admin.svg)](https://travis-ci.org/vencax/react-mobx-admin)
 
 Add a ReactJS admin GUI to any RESTful API.
-Unopinionated framework for React based admin applications heavily inspired by [admin-on-rest](https://github.com/marmelab/admin-on-rest).
+Minimalistic framework for React based admin applications heavily inspired by [admin-on-rest](https://github.com/marmelab/admin-on-rest).
 But this uses [MobX](https://mobxjs.github.io/mobx/) for state management.
 And aims to extendability and code readability and simplicity.
 

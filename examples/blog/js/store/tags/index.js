@@ -1,5 +1,5 @@
-import DataManipState from 'react-mobx-admin/state/data_manip'
-import DataTableState from 'react-mobx-admin/state/data_table'
+import DataManipState from 'react-mobx-admin/store/manip'
+import DataTableState from 'react-mobx-admin/store/list'
 
 class TagManipState extends DataManipState {
   //

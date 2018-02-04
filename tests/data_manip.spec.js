@@ -1,58 +1,29 @@
 import test from 'tape'
-import { when, observable } from 'mobx'
-import MockRequester from '../tests/mockRequester'
-import DataManipState from './data_manip'
+import MockRequester from './mockRequester'
+import TestManipState from './store/testManip'
 
-class State extends DataManipState {
-  @observable currentView = {}
-}
+const requester = new MockRequester()
 
-const cfg = {
-  view: {
-    validators: {
-      'title': (val) => {
-        if (!val || val.length === 0) {
-          return 'value must be provided'
-        }
-        if(val.length > 10) {
-          return 'value too long'
-        }
-      }
-    }
-  },
-  initNew: (record) => {
-    // simulation of loading or time expansive operation
-    return new Promise((resolve, reject) => {
-      setTimeout(()=> {
-        record.set('published', true)
-        resolve(record)
-      }, 200)
-    })
-  }
-}
-
-function _createState() {
-  const state = new State()
-  state.requester = new MockRequester()
+function _createState () {
+  const save = (data) => requester.save('test', data)
+  const state = new TestManipState(save)
   return state
 }
 
 test('it should be possible to showEntityDetail', t => {
   const state = _createState()
-  state.requester.data = {
-    "id": 1,
-    "title": "Sauron attacks",
-    "body": "<p>Rerum velit quos est <ur veniam fugit",
-    "views": 143
+  requester.data = {
+    'id': 1,
+    'title': 'Sauron attacks',
+    'published_at': '11/2/2017',
+    'unpublished_at': '11/3/2017'
   }
 
-  state.initEntityView('posts', 1, cfg)
+  state.load()
   t.equal(state.cv.state, 'loading')
 
   setTimeout(() => {
     t.equal(state.cv.state, 'ready')
-    t.equal(state.cv.origRecordId, 1)
-    t.equal(state.cv.entityname, 'posts')
     t.equal(state.cv.record.has('title'), true)
     t.equal(state.cv.record.get('title'), state.requester.data.title)
     t.equal(state.cv.record.has('body'), true)

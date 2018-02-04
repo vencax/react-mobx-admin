@@ -1,5 +1,5 @@
-import DataManipState from 'react-mobx-admin/state/data_manip'
-import DataTableState from 'react-mobx-admin/state/data_table'
+import DataManipState from 'react-mobx-admin/store/manip'
+import DataTableState from 'react-mobx-admin/store/list'
 
 class PostManipState extends DataManipState {
   //
@@ -8,9 +8,9 @@ class PostManipState extends DataManipState {
     this.store = store
   }
 
-  load() {
+  load(load) {
     this.store.loadOptions('tags', '/tags')
-    return super.load()
+    return super.load(load)
   }
 
   edittitle = 'edit a nice post'

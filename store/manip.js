@@ -1,4 +1,4 @@
-import {observable, computed, action, toJS} from 'mobx'
+import {observable, computed, action} from 'mobx'
 import deepEqual from 'deep-equal'
 
 export default class DataManipState {
@@ -28,7 +28,7 @@ export default class DataManipState {
 
   @action onLoaded (record) {
     this.origRecord = JSON.parse(JSON.stringify(record))  // deep clone :)
-    this.record.merge(record)
+    this.record.replace(record)
     this.runValidators()
     this.state = 'ready'
   }
@@ -53,7 +53,7 @@ export default class DataManipState {
   }
 
   @computed get isEntityChanged() {
-    const record = toJS(this.record)
+    const record = this.record.toJS()
     return ! deepEqual(this.origRecord, record, {strict: true})
   }
 

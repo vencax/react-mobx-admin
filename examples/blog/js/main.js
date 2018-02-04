@@ -6,7 +6,7 @@ import { startRouter } from 'mobx-router'
 import views from './routeconfig'
 
 // use it to create the app state
-import StateStore from './state'
+import StateStore from './store'
 const store = new StateStore(views)
 startRouter(views, store)
 

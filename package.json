@@ -1,10 +1,11 @@
 {
   "name": "react-mobx-admin",
   "version": "2.0.0",
-  "description": "unopinionated framework for React based admin applications",
+  "description": "minimalistic framework for React based admin applications usign MobX",
   "main": "index.js",
   "keywords": [
     "admin",
+    "react",
     "mobx",
     "rest"
   ],
@@ -19,7 +20,6 @@
   "license": "ISC",
   "peerDependencies": {
     "axios": "^0.14.0",
-    "material-ui": "^0.16.0",
     "mobx": "^2.3.7",
     "mobx-react": "^3.5.1",
     "react": "^15.2.1"
@@ -52,7 +52,6 @@
   },
   "dependencies": {
     "deep-equal": "^1.0.1",
-    "material-ui": "^0.20.0",
     "prop-types": "^15.6.0"
   }
 }
