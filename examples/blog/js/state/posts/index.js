@@ -39,11 +39,10 @@ class PostManipState extends DataManipState {
         return 'published at must be provided'
       }
     },
-    '_global': () => { // global validator
+    'unpublished_at': (val) => {
       const published_at = this.record.get('published_at')
-      const unpublished_at = this.record.get('unpublished_at')
-      if (published_at && unpublished_at && published_at > unpublished_at) {
-        return ['published must be less than unpublished']
+      if (published_at && val && published_at > val) {
+        return 'published must be less than unpublished'
       }
     }
   }
