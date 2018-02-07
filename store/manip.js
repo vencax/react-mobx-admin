@@ -5,7 +5,6 @@ export default class DataManipState {
 
   @observable record = new Map()
   @observable errors = new Map()
-  @observable saveErrors = []
   @observable state = 'loading'
 
   pkName = 'id'
@@ -80,7 +79,11 @@ export default class DataManipState {
 
   @action onError (err) {
     this.state = 'ready'
-    this.saveErrors = [err]
+    this.processError(err)
+  }
+
+  processError (err) {
+    alert(err)  // to be overriden, no one wants to alert some unreadables
   }
 
   // called on each update of edit form.
@@ -88,11 +91,8 @@ export default class DataManipState {
   @action updateData (fieldName, value) {
     value = value === '' ? null : value
     this.record.set(fieldName, value)
-    this.validateField(fieldName, value)
-    this.validateField('_global')
-    // run listeners
-    this.onFieldChange && this.onFieldChange[fieldName] &&
-      this.onFieldChange[fieldName].bind(this)(value)
+    this.runValidators()
+    this.onFieldChange && this.onFieldChange(fieldName, value)
   }
 
 }
