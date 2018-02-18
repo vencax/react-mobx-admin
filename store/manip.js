@@ -9,7 +9,8 @@ export default class DataManipState {
 
   pkName = 'id'
 
-  constructor (saveEntry) {
+  constructor (loadEntry, saveEntry) {
+    this.loadEntry = loadEntry
     this.saveEntry = saveEntry
   }
 
@@ -17,16 +18,19 @@ export default class DataManipState {
     return this.onLoaded({}) // init empty
   }
 
-  load (data) {
-    if (data && data.then) {
-      return data.then(this.onLoaded.bind(this))
-    } else {
-      return data ? this.onLoaded(data) : this.initNew()
-    }
+  load (id) {
+    return id
+      ? this.loadEntry(id).then(this.onLoaded.bind(this))
+      : this.initNew()
+  }
+
+  reload () {
+    const id = this.record.get(this.pkName)
+    return this.loadEntry(id).then(this.onLoaded.bind(this))
   }
 
   @action onLoaded (record) {
-    this.origRecord = JSON.parse(JSON.stringify(record))  // deep clone :)
+    this.origRecord = Object.assign({}, record)  // deep clone :)
     this.record.replace(record)
     this.runValidators()
     this.state = 'ready'

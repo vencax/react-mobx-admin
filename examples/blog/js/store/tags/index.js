@@ -3,8 +3,8 @@ import DataTableState from 'react-mobx-admin/store/list'
 
 class TagManipState extends DataManipState {
   //
-  constructor(store, saveEntry) {
-    super(saveEntry)
+  constructor(store, loadEntry, saveEntry) {
+    super(loadEntry, saveEntry)
     this.store = store
   }
 
