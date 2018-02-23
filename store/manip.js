@@ -47,9 +47,9 @@ export default class DataManipState {
     if (this.validators && this.validators[fieldName]) {
       const validatorFn = this.validators[fieldName].bind(this)
       const error = validatorFn(value, this.errors)
-      if(error === undefined && this.errors.has(fieldName)) {
+      if(!error && this.errors.has(fieldName)) {
         this.errors.delete(fieldName)
-      } else if (error !== undefined) {
+      } else if (error) {
         this.errors.set(fieldName, error)
       }
     }
