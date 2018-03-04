@@ -8,6 +8,7 @@ export default class DataTableState {
   @observable selection = []
   perPage = 15
   pkName = 'id'
+  perPageOptions = [10, 15, 20, 50, 100]
 
   constructor(router, getEntries, updateQPars) {
     this.router = router
@@ -23,8 +24,7 @@ export default class DataTableState {
     return this._refreshList()
   }
 
-  @action
-  updatePage(page) {
+  @action updatePage(page) {
     const newQPars = Object.assign({}, toJS(this.router.queryParams), {
       '_page': page
     })
@@ -32,8 +32,7 @@ export default class DataTableState {
     this.updateQPars(newQPars)
   }
 
-  @action
-  setPerPage(num) {
+  @action setPerPage(num) {
     const newQPars = Object.assign({}, toJS(this.router.queryParams), {
       '_page': 1,
       '_perPage': num
@@ -41,8 +40,7 @@ export default class DataTableState {
     this.updateQPars(newQPars)
   }
 
-  @action
-  updateSort(sortField, sortDir) {
+  @action updateSort(sortField, sortDir) {
     const qp = this.router.queryParams
     const sortFields = qp._sortField ? qp._sortField.split(',') : []
     const sortDirs = qp._sortDir ? qp._sortDir.split(',') : []
@@ -85,8 +83,7 @@ export default class DataTableState {
     return this.selection.map(i => this.items[i])
   }
 
-  @action
-  updateSelection(data) {
+  @action updateSelection(data) {
     this.selection = data
   }
 
@@ -119,13 +116,11 @@ export default class DataTableState {
     return JSON.stringify(this.filters) === JSON.stringify(this.appliedFilters)
   }
 
-  @action
-  updateFilterValue(name, value) {
+  @action updateFilterValue(name, value) {
     this.filters.set(name, value)
   }
 
-  @action
-  applyFilters() {
+  @action applyFilters() {
     const newQPars = Object.assign({}, this.filters.toJS(), {
       '_page': 1,  // need to go to 1st page due to limited results
       '_perPage': this.router.queryParams['_perPage'],
@@ -135,13 +130,11 @@ export default class DataTableState {
     this.updateQPars(newQPars)
   }
 
-  @action
-  showFilter(filter) {
+  @action showFilter(filter) {
     this.filters.set(filter, undefined)
   }
 
-  @action
-  hideFilter(filter) {
+  @action hideFilter(filter) {
     this.filters.delete(filter)
     const newQPars = Object.assign({}, this.filters.toJS(), {
       '_page': this.router.queryParams['_page'],
@@ -178,12 +171,10 @@ export default class DataTableState {
     .then(this.onDataLoaded.bind(this))
   }
 
-  @action
-  onDataLoaded(result) {
+  @action onDataLoaded(result) {
     this.state = 'ready'
     this.totalItems = result.totalItems
     this.items.replace(result.data)
     return result
   }
-
 }
