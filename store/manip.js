@@ -60,6 +60,13 @@ export default class DataManipState {
     return ! deepEqual(this.origRecord, record, {strict: true})
   }
 
+  isSaveEnabled () {
+    return this.errors.size === 0 && this.isEntityChanged
+  }
+  isBeingCreated () {
+    return this.record.has(this.pkName)
+  }
+
   @action save () {
     this.state = 'saving'
     return this.saveEntry(this.record.toJS())
