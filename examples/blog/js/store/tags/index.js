@@ -1,13 +1,7 @@
-import DataManipState from 'react-mobx-admin/store/manip'
-import DataTableState from 'react-mobx-admin/store/list'
+import {BaseTableState, BaseManipState} from '../bases'
 
-class TagManipState extends DataManipState {
+class TagManipState extends BaseManipState {
   //
-  constructor(store, loadEntry, saveEntry) {
-    super(loadEntry, saveEntry)
-    this.store = store
-  }
-
   initNew() {
     // simulation of loading or time expansive operation
     setTimeout(() => {
@@ -19,26 +13,19 @@ class TagManipState extends DataManipState {
   }
 
   validators = {
-    'name': (val) => {
-      if (!val || val.length === 0) {
-        return 'value must be provided'
-      }
-      if (val.length > 10) {
-        return 'value too long'
-      }
-    }
+    'name': (val) => this.lengthValidator(val, 10)
   }
 }
 export {TagManipState}
 
-class TagTableState extends DataTableState {
-  constructor(store, router, getEntries, updateQPars) {
-    super(router, getEntries, updateQPars)
-    this.store = store
-  }
-  perPage = 3
+class TagTableState extends BaseTableState {
   attrs = ['id', 'name', 'published']
-  headertitles = ['ID', 'Name', 'Published']
+  headers = {
+    id: 'ID', name: 'NaMe', published: 'PUBlished'
+  }
+  headerCreator (attr) {
+    return this.headers[attr]
+  }
   defaultSortField = 'name'
   defaultSortDir = 'ASC'
 }

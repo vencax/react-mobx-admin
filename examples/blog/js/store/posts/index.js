@@ -1,13 +1,7 @@
-import DataManipState from 'react-mobx-admin/store/manip'
-import DataTableState from 'react-mobx-admin/store/list'
+import {BaseTableState, BaseManipState} from '../bases'
 
-class PostManipState extends DataManipState {
+class PostManipState extends BaseManipState {
   //
-  constructor(store, loadEntry, saveEntry) {
-    super(loadEntry, saveEntry)
-    this.store = store
-  }
-
   load(load) {
     this.store.loadOptions('tags', '/tags')
     return super.load(load)
@@ -16,29 +10,10 @@ class PostManipState extends DataManipState {
   edittitle = 'edit a nice post'
   createtitle = 'add very interresting post ..'
   validators = {
-    'title': (val) => {
-      if (!val || val.length === 0) {
-        return 'title must be provided'
-      }
-      if (val && val.length > 10) {
-        return 'title too long'
-      }
-    },
-    'content': (val) => {
-      if (!val || val.length === 0) {
-        return 'content must be provided'
-      }
-    },
-    'category': (val) => {
-      if (! val) {
-        return 'category must be provided'
-      }
-    },
-    'published_at': (val) => {
-      if (! val) {
-        return 'published at must be provided'
-      }
-    },
+    'title': (val) => this.lengthValidator(val, 10),
+    'content': (val) => this.lengthValidator(val),
+    'category': (val) => this.lengthValidator(val),
+    'published_at': (val) => this.lengthValidator(val),
     'unpublished_at': (val) => {
       const published_at = this.record.get('published_at')
       if (published_at && val && published_at > val) {
@@ -59,21 +34,16 @@ class PostManipState extends DataManipState {
 }
 export {PostManipState}
 
-class PostTableState extends DataTableState {
+class PostTableState extends BaseTableState {
   //
-  constructor(store, router, getEntries, updateQPars) {
-    super(router, getEntries, updateQPars)
-    this.store = store
-  }
-
-  perPage = 6
   defaultSortField = 'title'
   defaultSortDir = 'ASC'
   attrs = ['id', 'title', 'category', 'published_at', 'unpublished_at', 'tags']
-  headertitles = ['id', 'title', 'cat', 'published', 'unpublished', 'tags']
+  headertitles (attr) {
+    return `title for ${attr}`
+  }
   noSort = ['id', 'tags']
-  title = 'posts'
-
+  
   init() {
     super.init()
     this.store.loadOptions('tags', '/tags')
