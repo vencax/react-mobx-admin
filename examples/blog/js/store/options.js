@@ -3,18 +3,20 @@ import TranslatStore from './transl'
 
 export default class OptionsStore extends TranslatStore {
 
-  // one of possible options loading ...
-  @observable options = observable.map({
-    'categories': [
+  options = {
+    categories: () => [
       {value: 'tech', label: 'Technology'},
       {value: 'art', label: 'Art'},
     ]
-  })
+  }
 
+  // one of possible options loading ...
   @action loadOptions(name, query) {
-    return this.requester.call(query).then((result) => {
-      this.options.set(name, result.data)
-    }).catch(this.onError.bind(this))
+    return this.requester.call(query)
+    .then((result) => {
+      this.options[name] = result.data
+    })
+    .catch(this.onError.bind(this))
   }
 
 }

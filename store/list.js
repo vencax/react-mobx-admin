@@ -112,6 +112,14 @@ export default class DataTableState {
     return applied
   }
 
+  isFilterValueChanged (filtername) {
+    return this.filters.get(filtername) !== this.router.queryParams[filtername]
+  }
+
+  isFilterApplied (filtername) {
+    return filtername in this.router.queryParams
+  }
+
   @computed get areFiltersApplied() {
     return JSON.stringify(this.filters) === JSON.stringify(this.appliedFilters)
   }
