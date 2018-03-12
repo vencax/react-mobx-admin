@@ -20,7 +20,7 @@ OptionsField.propTypes = {
     PropTypes.string,
     PropTypes.number
   ]),
-  options: PropTypes.object,
+  options: PropTypes.array.isRequired,
   labelattr: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func
