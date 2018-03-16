@@ -16,7 +16,7 @@
       "email": "adam@bluesky.pro"
     }
   ],
-  "repository": "https://github.com/blueskydigital/react-admin",
+  "repository": "https://github.com/vencax/react-mobx-admin",
   "license": "ISC",
   "peerDependencies": {
     "axios": "^0.14.0",
@@ -48,7 +48,8 @@
     "webpack-dev-server": "^2.5.1"
   },
   "scripts": {
-    "test": "make test"
+    "build": "./node_modules/.bin/webpack --env.prod -p",
+    "test": "NODE_ENV=test ./node_modules/.bin/tape -r babel-register -r ./tests/setup.js ./tests/**/*.spec.js"
   },
   "dependencies": {
     "deep-equal": "^1.0.1",

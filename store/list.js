@@ -1,6 +1,6 @@
 import {observable, computed, action, toJS} from 'mobx'
 
-export default class DataTableState {
+export default class DataTableStore {
 
   @observable state = 'loading'
   @observable items = []

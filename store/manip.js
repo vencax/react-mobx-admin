@@ -1,7 +1,7 @@
 import {observable, computed, action} from 'mobx'
 import deepEqual from 'deep-equal'
 
-export default class DataManipState {
+export default class DataManipStore {
 
   @observable record = new Map()
   @observable errors = new Map()
