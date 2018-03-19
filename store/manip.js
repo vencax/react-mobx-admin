@@ -9,10 +9,8 @@ export default class DataManipStore {
 
   pkName = 'id'
 
-  constructor (loadEntry, saveEntry) {
-    this.loadEntry = loadEntry
-    this.saveEntry = saveEntry
-  }
+  loadEntry () { throw new Error('implement loadEntry!!') }
+  saveEntry () { throw new Error('implement saveEntry!!') }
 
   initNew () {
     return this.onLoaded({}) // init empty
