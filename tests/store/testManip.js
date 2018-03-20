@@ -1,6 +1,6 @@
-import DataManipState from '../../store/manip'
+import ManipStore from '../../store/manip'
 
-export default class TestManipState extends DataManipState {
+export default class TestManipStore extends ManipStore {
   validators = {
     'title': (val) => {
       if (!val || val.length === 0) {
