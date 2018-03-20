@@ -1,15 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const OptionsField = ({val, attr, options, valueattr, labelattr, Component}) => {
-  const found = options ? options.filter((i) => {
-    return i[valueattr || 'value'] === val
-  }) : null
-  if (found && found.length > 0) {
-    const text = (typeof labelattr === 'function')
-      ? labelattr(found[0]) : found[0][labelattr || 'label']
-
-    return Component ? <Component text={text} /> : <span>{text}</span>
+const OptionsField = ({val, attr, options, extractOpt = (i) => i, Component = null}) => {
+  const found = options.find(i => {
+    const opt = extractOpt(i)
+    return opt.value === val
+  })
+  if (found) {
+    const opt = extractOpt(found)
+    return Component ? <Component text={opt.label} /> : <span>{opt.label}</span>
   }
   return null
 }
@@ -21,11 +20,7 @@ OptionsField.propTypes = {
     PropTypes.number
   ]),
   options: PropTypes.array.isRequired,
-  labelattr: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.func
-  ]),
-  valueattr: PropTypes.string,
+  extractOpt: PropTypes.func,
   Component: PropTypes.func
 }
 

@@ -28,10 +28,7 @@ export default class StateStore extends OptionsStore {
       return this.on404('unknown entity ' + entityname)
     }
     id = (id && id !== '_new') ? id : null
-    this.cv = new StoreClass(this,
-      (id) => this.requester.getEntry(entityname, id).catch(this.onError),
-      (data) => this.requester.saveEntry(entityname, data, data.id)
-    )
+    this.cv = new StoreClass(this)
     this.cv.load(id)
   }
 

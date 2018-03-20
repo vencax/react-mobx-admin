@@ -17,17 +17,3 @@ export function buildHeaders (attrs, titles, renderHeader, onSort, sortstate, no
 
   return headers
 }
-
-export function buildCells (attrs, fields, row, rowId, renderCell) {
-  let cells = []
-  let i
-
-  for (i = 0; i < attrs.length; i++) {
-    const attr = attrs[i]
-    const field = fields[i]
-    const cell = renderCell(row, attr, field, rowId)
-    cells.push(cell)
-  }
-
-  return cells
-}

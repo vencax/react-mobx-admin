@@ -3,9 +3,18 @@ import DataTableState from 'react-mobx-admin/store/list'
 
 class BaseManipState extends DataManipState {
   //
-  constructor(store, loadEntry, saveEntry) {
-    super(loadEntry, saveEntry)
+  constructor(store) {
+    super()
     this.store = store
+  }
+
+  loadEntry (id) {
+    const entityname = this.store.requester.router.params.entityname
+    return this.store.requester.getEntry(entityname, id)
+  }
+  saveEntry (data) {
+    const entityname = this.store.requester.router.params.entityname
+    return this.store.requester.saveEntry(entityname, data, data.id)
   }
 
   lengthValidator (val, max) {
