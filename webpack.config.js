@@ -1,4 +1,3 @@
-// const {getIfUtils, removeEmpty} = require('webpack-config-utils')
 const path = require('path')
 
 const babelOptions = {

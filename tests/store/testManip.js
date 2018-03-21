@@ -1,4 +1,4 @@
-import ManipStore from '../../store/manip'
+import ManipStore from '../../src/store/manip'
 
 export default class TestManipStore extends ManipStore {
   validators = {

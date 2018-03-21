@@ -40,12 +40,9 @@
     "babel-register": "^6.26.0",
     "jsdom": "^9.8.3",
     "mobx": "^4.1.0",
-    "mobx-react-devtools": "^4.2.15",
     "react-addons-test-utils": "^15.3.0",
     "tape": "^4.6.2",
-    "webpack": "^3.3.0",
-    "webpack-config-utils": "^2.1.0",
-    "webpack-dev-server": "^2.5.1"
+    "webpack": "^3.3.0"
   },
   "scripts": {
     "build": "./node_modules/.bin/webpack --env.prod -p",
