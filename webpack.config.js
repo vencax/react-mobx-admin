@@ -12,23 +12,21 @@ const babelOptions = {
 
 module.exports = (env = {dev: true}) => {
   return {
-    devtool: env.dev ? 'inline-sourcemap' : false,
-    entry: './main.js',
+    devtool: env.dev ? 'inline-sourcemap' : 'source-map',
+    entry: './src/main.js',
     module: {
       loaders: [{test: /\.js$/, loader: 'babel-loader', options: babelOptions}]
     },
     output: {
       path: path.join(__dirname, 'dist'),
-      filename: 'main.min.js'
+      filename: 'react-mobx-admin.min.js'
     },
     externals: {
-      'lodash': '_',
-      'axios': 'axios',
+      'underscore': '_',
       'mobx': 'mobx',
-      'prop-types': 'prop-types',
+      'prop-types': {commonjs: 'prop-types'},
       'mobx-react': 'mobxReact',
-      'react': 'React',
-      'react-dom': 'ReactDOM'
+      'react': 'React'
     }
   }
 }

@@ -2,7 +2,8 @@
   "name": "react-mobx-admin",
   "version": "2.1.0",
   "description": "minimalistic framework for React based admin applications usign MobX",
-  "main": "index.js",
+  "main": "dist/react-mobx-admin.min.js",
+  "unpkg": "dist/react-mobx-admin.min.js",
   "keywords": [
     "admin",
     "react",
@@ -19,9 +20,9 @@
   "repository": "https://github.com/vencax/react-mobx-admin",
   "license": "ISC",
   "peerDependencies": {
-    "axios": "^0.14.0",
     "mobx": "^2.3.7",
     "mobx-react": "^3.5.1",
+    "prop-types": "^15.6.0",
     "react": "^15.2.1"
   },
   "devDependencies": {
@@ -38,9 +39,8 @@
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
     "jsdom": "^9.8.3",
-    "json-server": "^0.8.22",
+    "mobx": "^4.1.0",
     "mobx-react-devtools": "^4.2.15",
-    "mobx-router": "github:vencax77/mobx-router",
     "react-addons-test-utils": "^15.3.0",
     "tape": "^4.6.2",
     "webpack": "^3.3.0",
@@ -49,10 +49,10 @@
   },
   "scripts": {
     "build": "./node_modules/.bin/webpack --env.prod -p",
+    "build:dev": "./node_modules/.bin/webpack --env.dev",
     "test": "NODE_ENV=test ./node_modules/.bin/tape -r babel-register -r ./tests/setup.js ./tests/**/*.spec.js"
   },
   "dependencies": {
-    "deep-equal": "^1.0.1",
-    "prop-types": "^15.6.0"
+    "deep-equal": "^1.0.1"
   }
 }
