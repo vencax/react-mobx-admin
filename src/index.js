@@ -1,10 +1,10 @@
 
-import TableStore from './store/list'
+import ListStore from './store/list'
 import ManipStore from './store/manip'
 import {paginationRange, buildTableHeaders} from './component_utils'
 
 export {
-  TableStore,
+  ListStore,
   ManipStore,
   buildTableHeaders,
   paginationRange
