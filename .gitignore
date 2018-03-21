@@ -1,10 +1,6 @@
 npm-debug.log
 package-lock.json
 node_modules/
-build/*.woff2
-build/*.svg
-build/*.ttf
-build/*.eot
-build/*.woff
+dist/
 examples/blog/build/*
 lib/
