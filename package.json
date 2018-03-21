@@ -1,6 +1,6 @@
 {
   "name": "react-mobx-admin",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "minimalistic framework for React based admin applications usign MobX",
   "main": "dist/react-mobx-admin.min.js",
   "unpkg": "dist/react-mobx-admin.min.js",
@@ -20,9 +20,7 @@
   "repository": "https://github.com/vencax/react-mobx-admin",
   "license": "ISC",
   "peerDependencies": {
-    "mobx": "^2.3.7",
-    "prop-types": "^15.6.0",
-    "react": "^15.2.1"
+    "mobx": "^2.3.7"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -44,7 +42,7 @@
     "webpack": "^3.3.0"
   },
   "scripts": {
-    "build": "./node_modules/.bin/webpack --env.prod -p",
+    "build": "./node_modules/.bin/webpack --env.prod -p --display-modules",
     "build:dev": "./node_modules/.bin/webpack --env.dev",
     "test": "NODE_ENV=test ./node_modules/.bin/tape -r babel-register -r ./tests/setup.js ./tests/**/*.spec.js"
   },

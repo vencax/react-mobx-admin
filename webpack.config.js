@@ -21,10 +21,7 @@ module.exports = (env = {dev: true}) => {
       filename: 'react-mobx-admin.min.js'
     },
     externals: {
-      'underscore': {root: '_', commonjs: 'underscore'},
-      'mobx': {root: 'mobx', commonjs2: 'mobx', commonjs: 'mobx'},
-      'prop-types': {root: 'propTypes', commonjs: 'prop-types'},
-      'react': {root: 'React', commonjs: 'react'}
+      'mobx': {root: 'mobx', commonjs2: 'mobx', commonjs: 'mobx'}
     }
   }
 }
