@@ -3,7 +3,7 @@ import deepEqual from 'deep-equal'
 
 export default class DataManipStore {
 
-  @observable record = new Map()
+  @observable record = {}
   @observable errors = new Map()
   @observable state = 'loading'
 
@@ -11,25 +11,22 @@ export default class DataManipStore {
 
   loadEntry () { throw new Error('implement loadEntry!!') }
   saveEntry () { throw new Error('implement saveEntry!!') }
+  initNew () { throw new Error('implement initNew!!') }
 
-  initNew () {
-    return this.onLoaded({}) // init empty
-  }
-
-  load (id) {
-    return id
-      ? this.loadEntry(id).then(this.onLoaded.bind(this))
-      : this.initNew()
+  @action load (id) {
+    this.state = 'loading'
+    const promise = id ? this.loadEntry(id) : this.initNew()
+    return promise.then(this.onLoaded.bind(this))
   }
 
   reload () {
-    const id = this.record.get(this.pkName)
+    const id = this.record[this.pkName]
     return this.loadEntry(id).then(this.onLoaded.bind(this))
   }
 
   @action onLoaded (record) {
     this.origRecord = Object.assign({}, record)  // deep clone :)
-    this.record.replace(record)
+    this.record = record
     this.runValidators()
     this.state = 'ready'
   }
@@ -37,7 +34,7 @@ export default class DataManipStore {
   @action runValidators () {
     const validators = this.validators || []
     for (let fieldName in validators) {
-      this.validateField(fieldName, this.record.get(fieldName))
+      this.validateField(fieldName, this.record[fieldName])
     }
   }
 
@@ -53,9 +50,8 @@ export default class DataManipStore {
     }
   }
 
-  @computed get isEntityChanged() {
-    const record = this.record.toJS()
-    return ! deepEqual(this.origRecord, record, {strict: true})
+  @computed get hasEntityChanged() {
+    return ! deepEqual(this.origRecord, this.record, {strict: true})
   }
 
   isSaveEnabled () {
@@ -67,22 +63,16 @@ export default class DataManipStore {
 
   @action save () {
     this.state = 'saving'
-    return this.saveEntry(this.record.toJS())
+    return this.saveEntry(this.record)
     .then(this.onSaved.bind(this))
     .catch(this.onError.bind(this))
   }
 
   @action onSaved (saved) {
-    this.origRecord = JSON.parse(JSON.stringify(saved)) // update origRecord coz saved
-    this.record.clear()
+    this.origRecord = Object.assign({}, saved) // update origRecord coz saved
+    this.record.
     this.record.merge(saved)
     this.state = 'ready'
-    // if (!this.origRecordId) {
-    //   const id = saved[this.pkName]
-    //   this.origRecordId = id
-    //   // if new is saved, we need to:
-    //   this.onLoaded(saved) //  run onLoaded
-    // }
     return this.record
   }
 
@@ -99,7 +89,7 @@ export default class DataManipStore {
   // validation performed if got some validators
   @action updateData (fieldName, value) {
     value = value === '' ? null : value
-    this.record.set(fieldName, value)
+    this.record[fieldName] = value
     this.runValidators()
     this.onFieldChange && this.onFieldChange(fieldName, value)
   }

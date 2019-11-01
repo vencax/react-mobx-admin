@@ -1,6 +1,6 @@
 {
   "name": "react-mobx-admin",
-  "version": "2.2.0",
+  "version": "3.2.0",
   "description": "minimalistic framework for React based admin applications usign MobX",
   "main": "dist/react-mobx-admin.min.js",
   "unpkg": "dist/react-mobx-admin.min.js",
