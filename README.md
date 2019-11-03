@@ -2,11 +2,11 @@
 
 [![Build Status](https://travis-ci.org/vencax/react-mobx-admin.svg)](https://travis-ci.org/vencax/react-mobx-admin)
 
-Minimalistic framework for React based admin applications heavily inspired by [admin-on-rest](https://github.com/marmelab/admin-on-rest).
-But this uses [MobX](https://mobxjs.github.io/mobx/) for state management.
-And aims to extendability and code readability and simplicity.
+Minimalistic [MobX](https://mobxjs.github.io/mobx/) stores for admin applications.
+Originaly inspired by [admin-on-rest](https://github.com/marmelab/admin-on-rest).
+Aims to extendability and code readability and simplicity.
 
-This lib provides only stores for two basic data operations:
+Stores for two basic data operations:
 - [list](store/list.js): + paging, sorting, filtering
 - [manipulation](store/manip.js): form editing, validation
 
