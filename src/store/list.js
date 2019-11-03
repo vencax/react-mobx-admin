@@ -1,7 +1,7 @@
 import {observable, computed, action, toJS} from 'mobx'
 
 export default class DataTableStore {
-
+  //
   @observable state = 'loading'
   @observable items = []
   @observable totalItems = 0
@@ -10,22 +10,24 @@ export default class DataTableStore {
   pkName = 'id'
   perPageOptions = [10, 15, 20, 50, 100]
 
-  constructor(router, getEntries, updateQPars) {
-    this.router = router
-    this.getEntries = getEntries
-    this.updateQPars = updateQPars
-    for (let attr in router.queryParams) {  // init filters
-      attr[0] !== '_' && this.filters.set(attr, router.queryParams[attr])
+  constructor(routerStore) {
+    this.routerStore = routerStore
+    const qp = this.routerStore.queryParams
+    for (let attr in qp) {  // init filters
+      attr[0] !== '_' && this.filters.set(attr, qp[attr])
     }
   }
 
-  init() {
+  getEntries () { throw new Error('implement getEntries!!') }
+  updateQPars (newQPars) { throw new Error('implement updateQPars!!') }
+
+  load() {
     this.setDefaults()
     return this._refreshList()
   }
 
   @action updatePage(page) {
-    const newQPars = Object.assign({}, toJS(this.router.queryParams), {
+    const newQPars = Object.assign({}, toJS(this.routerStore.queryParams), {
       '_page': page
     })
     this.selection = []
@@ -33,7 +35,7 @@ export default class DataTableStore {
   }
 
   @action setPerPage(num) {
-    const newQPars = Object.assign({}, toJS(this.router.queryParams), {
+    const newQPars = Object.assign({}, toJS(this.routerStore.queryParams), {
       '_page': 1,
       '_perPage': num
     })
@@ -41,7 +43,7 @@ export default class DataTableStore {
   }
 
   @action updateSort(sortField, sortDir) {
-    const qp = this.router.queryParams
+    const qp = this.routerStore.queryParams
     const sortFields = qp._sortField ? qp._sortField.split(',') : []
     const sortDirs = qp._sortDir ? qp._sortDir.split(',') : []
     const sortStateIdx = sortFields.indexOf(sortField)
@@ -54,7 +56,7 @@ export default class DataTableStore {
       sortFields.push(sortField)
       sortDirs.push(sortDir)
     }
-    const newQPars = Object.assign({}, toJS(this.router.queryParams), {
+    const newQPars = Object.assign({}, toJS(this.routerStore.queryParams), {
       '_sortField': sortFields.join(','),
       '_sortDir': sortDirs.join(',')
     })
@@ -104,20 +106,20 @@ export default class DataTableStore {
 
   @computed get appliedFilters() {
     const applied = {}
-    for (let k in this.router.queryParams) {
+    for (let k in this.routerStore.queryParams) {
       if (k[0] !== '_') {
-        applied[k] = this.router.queryParams[k]
+        applied[k] = this.routerStore.queryParams[k]
       }
     }
     return applied
   }
 
   isFilterValueChanged (filtername) {
-    return this.filters.get(filtername) !== this.router.queryParams[filtername]
+    return this.filters.get(filtername) !== this.routerStore.queryParams[filtername]
   }
 
   isFilterApplied (filtername) {
-    return filtername in this.router.queryParams
+    return filtername in this.routerStore.queryParams
   }
 
   @computed get areFiltersApplied() {
@@ -131,9 +133,9 @@ export default class DataTableStore {
   @action applyFilters() {
     const newQPars = Object.assign({}, this.filters.toJS(), {
       '_page': 1,  // need to go to 1st page due to limited results
-      '_perPage': this.router.queryParams['_perPage'],
-      '_sortField': this.router.queryParams['_sortField'],
-      '_sortDir': this.router.queryParams['_sortDir']
+      '_perPage': this.routerStore.queryParams['_perPage'],
+      '_sortField': this.routerStore.queryParams['_sortField'],
+      '_sortDir': this.routerStore.queryParams['_sortDir']
     })
     this.updateQPars(newQPars)
   }
@@ -145,10 +147,10 @@ export default class DataTableStore {
   @action hideFilter(filter) {
     this.filters.delete(filter)
     const newQPars = Object.assign({}, this.filters.toJS(), {
-      '_page': this.router.queryParams['_page'],
-      '_perPage': this.router.queryParams['_perPage'],
-      '_sortField': this.router.queryParams['_sortField'],
-      '_sortDir': this.router.queryParams['_sortDir']
+      '_page': this.routerStore.queryParams['_page'],
+      '_perPage': this.routerStore.queryParams['_perPage'],
+      '_sortField': this.routerStore.queryParams['_sortField'],
+      '_sortDir': this.routerStore.queryParams['_sortDir']
     })
     this.updateQPars(newQPars)
   }
@@ -160,7 +162,7 @@ export default class DataTableStore {
   }
 
   setDefaults() {
-    const qp = this.router.queryParams
+    const qp = this.routerStore.queryParams
     // set params if missing _page || _perPage
     qp._page = qp._page ? qp._page : 1
     qp._perPage = qp._perPage ? qp._perPage : this.perPage
@@ -172,7 +174,7 @@ export default class DataTableStore {
 
   _refreshList() {
     this.state = 'loading'
-    return this.getRequestParams(toJS(this.router.queryParams))
+    return this.getRequestParams(toJS(this.routerStore.queryParams))
     .then(pars => {
       return this.getEntries(pars)
     })
