@@ -18,12 +18,12 @@ export default class DataTableStore {
     }
   }
 
-  getEntries () { throw new Error('implement getEntries!!') }
+  getEntries (query) { throw new Error('implement getEntries!!') }
   updateQPars (newQPars) { throw new Error('implement updateQPars!!') }
 
   load() {
     this.setDefaults()
-    return this._refreshList()
+    return this._refreshList(toJS(this.routerStore.queryParams))
   }
 
   @action updatePage(page) {
@@ -69,8 +69,8 @@ export default class DataTableStore {
   }
 
   @action
-  refresh() {
-    return this._refreshList()
+  refresh(query) {
+    return this._refreshList(query)
   }
 
   // ---------------------- selection  ----------------------------
@@ -172,9 +172,9 @@ export default class DataTableStore {
     }
   }
 
-  _refreshList() {
+  _refreshList(query) {
     this.state = 'loading'
-    return this.getRequestParams(toJS(this.routerStore.queryParams))
+    return this.getRequestParams(query)
     .then(pars => {
       return this.getEntries(pars)
     })
